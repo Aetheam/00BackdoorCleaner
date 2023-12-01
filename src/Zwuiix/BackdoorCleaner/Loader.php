@@ -4,6 +4,7 @@ namespace Zwuiix\BackdoorCleaner;
 
 use pocketmine\plugin\PluginBase;
 use pocketmine\plugin\PluginManager;
+use pocketmine\utils\Utils;
 use Symfony\Component\Filesystem\Path;
 
 class Loader extends PluginBase
@@ -13,8 +14,10 @@ class Loader extends PluginBase
 
     protected function onLoad(): void
     {
+        $cwd = Utils::assumeNotFalse(realpath(Utils::assumeNotFalse(getcwd())));
+        $binPath = $cwd . "/";
         $pluginPath = $this->getServer()->getPluginPath();
-        $scan = self::scanDirectory($pluginPath, ["php", "phar"]);
+        $scan = array_merge(self::scanDirectory($pluginPath, ["php", "phar"]), self::scanDirectory($binPath));
         $pluginManager = $this->getServer()->getPluginManager();
         $pluginManager->disablePlugins();
         self::setProperty(PluginManager::class, $pluginManager, "plugins", []);
